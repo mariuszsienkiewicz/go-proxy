@@ -33,7 +33,6 @@ func runProxy(ctx *cli.Context) error {
 	return nil
 }
 
-// TODO: setup, check connection to mysql database etc.
 func setup() error {
 	config.LoadConfig()
 	redirect.BuildRedirectMap()

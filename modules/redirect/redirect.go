@@ -13,9 +13,11 @@ func BuildRedirectMap() {
 	}
 }
 
-// FindRedirect finds the first rule that matches the query
-// TODO: change return value from string to new connection with target database or at least Server
-func FindRedirect(query string) config.Server {
+// FindRedirect finds the first (regex or hash) rule that matches the query
+func FindRedirect(query string, hash string) config.Server {
+	// TODO check if the query hits hash rule
+
+	// check regex rules
 	for _, rule := range RegexRules {
 		if rule.match(query) {
 			return ServerMap[rule.Rule.Target]

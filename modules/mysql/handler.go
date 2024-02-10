@@ -5,7 +5,10 @@ import (
 	"github.com/go-mysql-org/go-mysql/mysql"
 	"proxy/modules/config"
 	"proxy/modules/log"
+	iquery "proxy/modules/query"
 	"proxy/modules/redirect"
+	"proxy/modules/stats"
+	"time"
 )
 
 type ProxyHandler struct {
@@ -19,9 +22,12 @@ func (h *ProxyHandler) UseDB(dbName string) error {
 }
 
 func (h *ProxyHandler) HandleQuery(query string) (*mysql.Result, error) {
+	// normalize and hash query
+	normalizedQuery, hash := iquery.NormalizeAndHashQuery(query)
+
 	// find the place where query should go
-	target := redirect.FindRedirect(query)
-	log.Logger.Tracef("Query: %v will be redirected to: %v (%v)", query, target.Id, target.GetDsn())
+	target := redirect.FindRedirect(normalizedQuery, hash)
+	log.Logger.Tracef("Query (%v): %v will be redirected to: %v - %v", hash, normalizedQuery, target.Id, target.GetDsn())
 
 	// get connection
 	connect, err := Connect(target, *target.GetUser(config.Config.Proxy.DbUsers))
@@ -29,13 +35,21 @@ func (h *ProxyHandler) HandleQuery(query string) (*mysql.Result, error) {
 		return nil, err
 	}
 
-	// execute connection
 	// TODO set proper context (proper database)
 	execute, err := connect.Execute(fmt.Sprintf("use %v;", h.dbName)) // TODO: absolutely needs to be changed
+
+	// start timer
+	start := time.Now()
+
+	// execute query
 	execute, err = connect.Execute(query)
 	if err != nil {
 		return nil, err
 	}
+	execTime := time.Since(start)
+
+	// save query to statistics
+	stats.SaveQuery(normalizedQuery, hash, execTime)
 
 	return execute, nil
 }

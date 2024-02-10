@@ -5,6 +5,7 @@ go 1.21
 require github.com/urfave/cli/v2 v2.27.1
 
 require (
+	github.com/DataDog/go-sqllexer v0.0.10 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/go-mysql-org/go-mysql v1.7.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
