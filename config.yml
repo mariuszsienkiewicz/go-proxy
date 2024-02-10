@@ -21,6 +21,9 @@ proxy:
     - name: "REDIRECT SELECT QUERIES TO REPLICA"
       regex_rule: "^SELECT.*"
       target_id: "R1"
+    - name: "SELECT * FROM versions WHERE major=?"
+      hash_rule: "3c343df0eb5b1832b1c8443e63340718dae9c8dbaaa43193e3db435d40dffe94"
+      target_id: "R1"
   access:
     user: "user"
     password: ""

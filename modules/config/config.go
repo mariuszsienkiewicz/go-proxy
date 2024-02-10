@@ -7,9 +7,11 @@ import (
 )
 
 var (
+	// Config - in memory config representation of the yaml configuration file
 	Config Configuration
 )
 
+// Configuration config struct, represents the yaml configuration file
 type Configuration struct {
 	Proxy struct {
 		Basics        Basics   `yaml:"basics"`
@@ -21,6 +23,7 @@ type Configuration struct {
 	} `yaml:"proxy"`
 }
 
+// LoadConfig loads the configuration to memory and verifies correctness of the configuration file
 func LoadConfig() {
 	yamlFile, err := os.ReadFile("config.yml")
 	if err != nil {
@@ -35,14 +38,18 @@ func LoadConfig() {
 	if err := validate(); err != nil {
 		log.Logger.Fatal(err)
 	}
+
+	// TODO: build additional structures (for example hash rules map)
 }
 
 func validate() error {
 	if err := ValidateBasicConfiguration(); err != nil {
 		return err
 	}
-
 	if err := ValidateServerConfiguration(); err != nil {
+		return err
+	}
+	if err := ValidateRuleConfiguration(); err != nil {
 		return err
 	}
 
