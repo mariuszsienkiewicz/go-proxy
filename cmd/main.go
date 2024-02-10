@@ -15,7 +15,7 @@ func NewProxyApp() *cli.App {
 	app.Version = "1.0.0"
 
 	subCmdWithConfig := []*cli.Command{
-		CmdProxy,
+		Proxy,
 	}
 
 	app.Commands = append(app.Commands, subCmdWithConfig...)
