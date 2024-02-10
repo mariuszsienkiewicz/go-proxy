@@ -1,28 +1,33 @@
 proxy:
-  port: 6666
+  basics:
+    host: "127.0.0.1"
+    port: 1234
   servers:
     - name: "PRIMARY"
       id: "P1"
-      host: "127.0.0.1"
+      host: "192.168.250.230"
       port: 3306
+      required: true
+      test_db: "test"
+      default: true
     - name: "REPLICA"
       id: "R1"
       host: "192.168.250.230"
       port: 3306
   rules:
-    - name: "REDIRECT SELECT QUERIES TO REPLICA"
-      regex_rule: "SELECT.*"
-      target_id: "R1"
     - name: "REDIRECT SELECT FOR UPDATE QUERIES TO PRIMARY"
-      regex_rule: "UPDATE FOR SELECT.*"
+      regex_rule: "^SELECT FOR UPDATE.*"
       target_id: "P1"
+    - name: "REDIRECT SELECT QUERIES TO REPLICA"
+      regex_rule: "^SELECT.*"
+      target_id: "R1"
   access:
     user: "user"
-    password: "password"
+    password: ""
   db_users:
     - target: "P1"
-      user: "P1_user"
-      password: "P1_password"
+      user: "root"
+      password: "passwd"
     - target: "R1"
-      user: "R1_user"
-      password: "R1_password"
+      user: "root"
+      password: "passwd"
