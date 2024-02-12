@@ -1,6 +1,51 @@
 # go-proxy
 
-Service written in Go language that allows splitting query destinations to a MySQL database using query rules.
+Service written in Go language that allows splitting query destinations to a MySQL databases using query rules.
+
+## QDS - Query destination split
+
+**QDS** has for now two ways of splitting:
+
+- Regex Rule Split
+- Hash Rule Split
+
+Both of them allow you to split the query direction but using different ways to find the destiny. Both are compatible with the caching system.
+
+### RRS - Regex Rule Split
+
+#### What you should know
+
+- If many RRS's matches the query then the first in configuration will be used
+- RRS for now is case-sensitive
+- Queries that are checked against the regex are first normalized to make things simpler
+
+#### How to use it
+
+You can write your own regex rule that if matches the query, then it will be used by `go-proxy`. So, let's imagine that you want to redirect all `SELECT` queries made to table `large_table` to **replica** (ID of replica is `R1`).
+
+You can create the RRS with this regex: `^SELECT.*FROM.*large_table.*` (you should spend more time creating this regex, this is a very basic example and as you can see it's far from being ideal):
+
+Now you can add new regex rule to the `config.yml` file:
+
+```yml
+name: "REDIRECT ALL SELECT QUERIES MADE TO large_table TO R1"
+regex_rule: "SELECT.*FROM.*large_table.*"
+target_id: "R1"
+```
+
+### HRS - Hash Rule Split
+
+## TODO
+
+### Mandatory
+
+- [ ] Docs
+- [ ] Add SQLite to save stats and other data
+- [ ] Make In-Memory redirect cache optional (in configuration file)
+
+### Nice to have
+
+- [ ] Redis Cache (redirect cache)
 
 ## Configuration
 
