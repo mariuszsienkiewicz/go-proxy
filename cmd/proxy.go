@@ -35,8 +35,7 @@ func runProxy(ctx *cli.Context) error {
 
 func setup() error {
 	config.LoadConfig()
-	redirect.BuildRedirectMap()
-	redirect.BuildRegexRules()
+	redirect.BuildRules()
 
 	// check if it's possible to connect with the databases
 	log.Logger.Tracef("Checking servers: %v", config.Config.Proxy.Servers)

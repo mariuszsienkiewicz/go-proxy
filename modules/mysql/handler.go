@@ -27,7 +27,7 @@ func (h *ProxyHandler) HandleQuery(query string) (*mysql.Result, error) {
 
 	// find the place where query should go
 	target := redirect.FindRedirect(normalizedQuery, hash)
-	log.Logger.Tracef("Query (%v): %v will be redirected to: %v - %v", hash, normalizedQuery, target.Id, target.GetDsn())
+	log.Logger.Tracef("[QUERY - %v]: %v will be redirected to: %v - %v", hash, normalizedQuery, target.Id, target.GetDsn())
 
 	// get connection
 	connect, err := Connect(target, *target.GetUser(config.Config.Proxy.DbUsers))
