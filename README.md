@@ -9,14 +9,14 @@ Service written in Go language that allows splitting query destinations to a MyS
 - Regex Rule Split
 - Hash Rule Split
 
-Both of them allow you to split the query direction but using different ways to find the destiny. Both are compatible with the caching system.
+Both of them allow you to split the query direction but use different ways to find the destiny. Both are compatible with the caching system.
 
 ### RRS - Regex Rule Split
 
 #### What you should know
 
 - If many RRS's matches the query then the first in configuration will be used
-- RRS for now is case-sensitive
+- RRS **for now** is case-sensitive
 - Queries that are checked against the regex are first normalized to make things simpler
 
 #### How to use it
