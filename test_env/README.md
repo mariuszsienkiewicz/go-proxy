@@ -6,8 +6,4 @@ The `go-proxy` service should be run locally, the `mysql` containing `primary` a
 
 ### How to run `Docker`
 
-Using **Powershell**:
-
-```shell
-docker run --name main-mysql -v $pwd/main_cnf/main.cnf
-```
+You can set up the test environment via `docker-compose`.

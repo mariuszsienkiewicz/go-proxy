@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  main:
+    image: mysql:latest
+    container_name: main_db
+    volumes:
+      - ./main_cnf:/etc/mysql/conf.d
+    ports:
+      - "6033:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 'rootpass'
+      MYSQL_DATABASE: 'db'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'userpass'
+
+  replica:
+    image: mysql:latest
+    container_name: replica_db
+    volumes:
+      - ./replica_cnf:/etc/mysql/conf.d
+    ports:
+      - "7033:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 'rootpass'
+      MYSQL_DATABASE: 'db'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'userpass'
