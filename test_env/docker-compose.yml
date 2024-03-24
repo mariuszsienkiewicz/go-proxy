@@ -3,6 +3,7 @@ version: '3'
 services:
   main:
     image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
     container_name: main_db
     volumes:
       - ./main/cnf:/etc/mysql/conf.d
@@ -19,13 +20,14 @@ services:
       # environment variables for go-proxy
       GOPROXY_REPLICATION_USER: 'repluser'
       GOPROXY_REPLICATION_PASSWORD: 'replpass'
-    entrypoint: ['bash', '/setup/setup.sh']
 
   replica:
     image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
     container_name: replica_db
     volumes:
-      - ./replica_cnf:/etc/mysql/conf.d
+      - ./replica/cnf:/etc/mysql/conf.d
+      - ./replica/setup:/setup
     ports:
       - "7033:3306"
     restart: always
@@ -38,3 +40,4 @@ services:
       # environment variables for go-proxy
       GOPROXY_REPLICATION_USER: 'repluser'
       GOPROXY_REPLICATION_PASSWORD: 'replpass'
+      GOPROXY_MASTER_HOSTNAME: 'main_db'

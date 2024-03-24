@@ -1,2 +1,3 @@
 [mysqld]
 server_id=1
+replicate-do-db=db
