@@ -5,15 +5,21 @@ services:
     image: mysql:latest
     container_name: main_db
     volumes:
-      - ./main_cnf:/etc/mysql/conf.d
+      - ./main/cnf:/etc/mysql/conf.d
+      - ./main/setup:/setup
     ports:
       - "6033:3306"
     restart: always
     environment:
+      # mysql image environment variables
       MYSQL_ROOT_PASSWORD: 'rootpass'
       MYSQL_DATABASE: 'db'
       MYSQL_USER: 'user'
       MYSQL_PASSWORD: 'userpass'
+      # environment variables for go-proxy
+      GOPROXY_REPLICATION_USER: 'repluser'
+      GOPROXY_REPLICATION_PASSWORD: 'replpass'
+    entrypoint: ['bash', '/setup/setup.sh']
 
   replica:
     image: mysql:latest
@@ -24,7 +30,11 @@ services:
       - "7033:3306"
     restart: always
     environment:
+      # mysql image environment variables
       MYSQL_ROOT_PASSWORD: 'rootpass'
       MYSQL_DATABASE: 'db'
       MYSQL_USER: 'user'
       MYSQL_PASSWORD: 'userpass'
+      # environment variables for go-proxy
+      GOPROXY_REPLICATION_USER: 'repluser'
+      GOPROXY_REPLICATION_PASSWORD: 'replpass'

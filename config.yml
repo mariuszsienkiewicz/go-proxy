@@ -5,15 +5,15 @@ proxy:
   servers:
     - name: "PRIMARY"
       id: "P1"
-      host: "192.168.250.230"
-      port: 3306
+      host: "localhost"
+      port: 6033
       required: true
-      test_db: "test"
+      test_db: "db"
       default: true
     - name: "REPLICA"
       id: "R1"
-      host: "192.168.250.230"
-      port: 3306
+      host: "localhost"
+      port: 7033
   rules:
     - name: "REDIRECT SELECT FOR UPDATE QUERIES TO PRIMARY"
       regex_rule: "^SELECT FOR UPDATE.*"
@@ -29,8 +29,8 @@ proxy:
     password: ""
   db_users:
     - target: "P1"
-      user: "root"
-      password: "passwd"
+      user: "user"
+      password: "userpass"
     - target: "R1"
-      user: "root"
-      password: "passwd"
+      user: "user"
+      password: "userpass"
