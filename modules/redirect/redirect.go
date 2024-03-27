@@ -3,6 +3,7 @@ package redirect
 import (
 	"proxy/modules/cache/redirect"
 	"proxy/modules/config"
+	"proxy/modules/log"
 )
 
 var (
@@ -46,6 +47,7 @@ func FindRedirect(query string, hash string) config.Server {
 	// if none of the hash rules match, then check the regex rules
 	regexRule, regexRuleHit := FindRegexRule(query)
 	if regexRuleHit {
+		log.Logger.Tracef("Regex rule found for query: %s", query)
 		redirectCache.Add(hash, regexRule.Target)
 		return regexRule.Target
 	}

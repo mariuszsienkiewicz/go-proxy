@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"fmt"
+	"context"
 	"github.com/urfave/cli/v2"
-	"strings"
+	"proxy/modules/log"
 )
 
 func NewProxyApp() *cli.App {
@@ -23,16 +23,18 @@ func NewProxyApp() *cli.App {
 	return app
 }
 
-func RunProxyApp(app *cli.App, args ...string) error {
-	err := app.Run(args)
-	if err == nil {
-		return nil
+func RunProxyApp(ctx context.Context, app *cli.App, args ...string) error {
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		default:
+			err := app.RunContext(ctx, args)
+			if err == nil {
+				return nil
+			} else {
+				log.Logger.Error(err)
+			}
+		}
 	}
-	if strings.HasPrefix(err.Error(), "flag provided but not defined:") {
-		cli.OsExiter(1)
-		return err
-	}
-	_, _ = fmt.Fprintf(app.ErrWriter, "Command error: %v\n", err)
-	cli.OsExiter(1)
-	return err
 }

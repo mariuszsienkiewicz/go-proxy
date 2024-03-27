@@ -27,7 +27,7 @@ func (h *ProxyHandler) HandleQuery(query string) (*mysql.Result, error) {
 
 	// find the place where query should go
 	target := redirect.FindRedirect(normalizedQuery, hash)
-	log.Logger.Tracef("[QUERY - %v]: %v will be redirected to: %v - %v", hash, normalizedQuery, target.Id, target.GetDsn())
+	log.Logger.Tracef("Query \"%v\" will be redirected to: %v (Host: %v, Hash: %s)", normalizedQuery, target.Id, target.GetDsn(), hash)
 
 	// get connection
 	connect, err := Connect(target, *target.GetUser(config.Config.Proxy.DbUsers))
@@ -35,7 +35,7 @@ func (h *ProxyHandler) HandleQuery(query string) (*mysql.Result, error) {
 		return nil, err
 	}
 
-	// TODO set proper context (proper database)
+	// TODO set proper proper database
 	execute, err := connect.Execute(fmt.Sprintf("use %v;", h.dbName)) // TODO: absolutely needs to be changed
 
 	// start timer

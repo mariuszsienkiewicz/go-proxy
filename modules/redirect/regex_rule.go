@@ -29,8 +29,9 @@ func BuildRegexRules() {
 	for _, rule := range config.Config.Proxy.Rules {
 		if rule.Regex != "" {
 			r := RegexRule{
-				Rule:  rule,
-				Regex: rule.Regex,
+				Rule:   rule,
+				Regex:  rule.Regex,
+				Target: ServerMap[rule.Target],
 			}
 			r.compile()
 			RegexRules = append(RegexRules, r)

@@ -10,5 +10,5 @@ var (
 )
 
 func SetLogger() {
-	Logger = log.New(os.Stderr).WithDebug() // TODO make debug optional
+	Logger = log.New(os.Stdout).WithDebug() // TODO make debug optional
 }

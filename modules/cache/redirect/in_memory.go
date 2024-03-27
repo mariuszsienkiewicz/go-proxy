@@ -16,12 +16,12 @@ func NewInMemoryCache() *InMemoryCache {
 }
 
 func (c InMemoryCache) Add(hash string, server config.Server) {
-	log.Logger.Tracef("[CACHE - %v]: <Add> (Target: %v)", hash, server.Id)
+	log.Logger.Tracef("Add Redirect To Cache (Hash %s, Target: %v)", hash, server.Id)
 	c.cache[hash] = server
 }
 
 func (c InMemoryCache) Find(hash string) (config.Server, bool) {
 	s, ok := c.cache[hash]
-	log.Logger.Tracef("[CACHE - %v]: <Find> (Found: %v, Target: %v)", hash, ok, s.Id)
+	log.Logger.Tracef("Find Redirect In Cache (Hash: %s, Found: %v, Target: %v)", hash, ok, s.Id)
 	return s, ok
 }
