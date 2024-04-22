@@ -25,3 +25,8 @@ func (c InMemoryCache) Find(hash string) (config.Server, bool) {
 	log.Logger.Tracef("Find Redirect In Cache (Hash: %s, Found: %v, Target: %v)", hash, ok, s.Id)
 	return s, ok
 }
+
+func (c InMemoryCache) Clear() {
+	c.cache = make(map[string]config.Server)
+	log.Logger.Tracef("Clear Redirect In Cache")
+}

@@ -7,4 +7,5 @@ import (
 type Cache interface {
 	Add(hash string, server config.Server)
 	Find(hash string) (config.Server, bool)
+	Clear()
 }
