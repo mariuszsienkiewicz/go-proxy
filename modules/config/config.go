@@ -14,11 +14,12 @@ var (
 // Configuration config struct, represents the yaml configuration file
 type Configuration struct {
 	Proxy struct {
-		Basics        Basics   `yaml:"basics"`
-		Servers       []Server `yaml:"servers"`
-		DbUsers       []DbUser `yaml:"db_users"`
-		Access        Access   `yaml:"access"`
-		Rules         []Rule   `yaml:"rules"`
+		Basics        Basics        `yaml:"basics"`
+		ServerGroups  []ServerGroup `yaml:"server_groups"`
+		Servers       []Server      `yaml:"servers"`
+		DbUsers       []DbUser      `yaml:"db_users"`
+		Access        Access        `yaml:"access"`
+		Rules         []Rule        `yaml:"rules"`
 		DefaultServer *Server
 	} `yaml:"proxy"`
 }
@@ -38,8 +39,6 @@ func LoadConfig() {
 	if err := validate(); err != nil {
 		log.Logger.Fatal(err)
 	}
-
-	// TODO: build additional structures (for example hash rules map)
 }
 
 func validate() error {

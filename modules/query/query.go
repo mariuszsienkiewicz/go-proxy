@@ -16,11 +16,11 @@ func NormalizeQuery(query string) string {
 }
 
 func NormalizeAndHashQuery(query string) (string, string) {
-	obfuscated := NormalizeQuery(query)
+	normalized := NormalizeQuery(query)
 
-	hasher := sha256.New()
-	hasher.Write([]byte(obfuscated))
-	hash := hasher.Sum(nil)
+	sha256Hash := sha256.New()
+	sha256Hash.Write([]byte(normalized))
+	hash := sha256Hash.Sum(nil)
 
-	return obfuscated, hex.EncodeToString(hash)
+	return normalized, hex.EncodeToString(hash)
 }

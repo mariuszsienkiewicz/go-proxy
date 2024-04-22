@@ -2,6 +2,8 @@ package config
 
 import "fmt"
 
+// TODO - add a way to change connection pool settings
+
 type Basics struct {
 	Port uint16 `yaml:"port"`
 	Host string `yaml:"host"`

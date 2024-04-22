@@ -2,6 +2,11 @@ proxy:
   basics:
     host: "127.0.0.1"
     port: 1234
+  server_groups:
+    - id: "RS"
+      type: R
+    - id: "WS"
+      type: P
   servers:
     - name: "PRIMARY"
       id: "P1"
@@ -10,20 +15,22 @@ proxy:
       required: true
       test_db: "db"
       default: true
+      server_group: "WS"
     - name: "REPLICA"
       id: "R1"
       host: "localhost"
       port: 7033
+      server_group: "RS"
   rules:
     - name: "REDIRECT SELECT FOR UPDATE QUERIES TO PRIMARY"
       regex_rule: "^SELECT FOR UPDATE.*"
-      target_id: "P1"
+      target_id: "WS"
     - name: "REDIRECT SELECT QUERIES TO REPLICA"
       regex_rule: "^SELECT.*"
-      target_id: "R1"
+      target_id: "RS"
     - name: "SELECT * FROM versions WHERE major=?"
       hash_rule: "3c343df0eb5b1832b1c8443e63340718dae9c8dbaaa43193e3db435d40dffe94"
-      target_id: "R1"
+      target_id: "RS"
   access:
     user: "user"
     password: ""

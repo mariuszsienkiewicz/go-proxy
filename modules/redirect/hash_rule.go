@@ -5,8 +5,8 @@ import (
 )
 
 type HashRule struct {
-	Rule   config.Rule
-	Target config.Server
+	Rule        config.Rule
+	TargetGroup string
 }
 
 var (
@@ -21,8 +21,8 @@ func BuildHashRules() {
 	for _, rule := range config.Config.Proxy.Rules {
 		if rule.Hash != "" {
 			HashRules[rule.Hash] = HashRule{
-				Rule:   rule,
-				Target: ServerMap[rule.Target],
+				Rule:        rule,
+				TargetGroup: rule.Target,
 			}
 		}
 	}

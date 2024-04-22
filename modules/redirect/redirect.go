@@ -7,30 +7,21 @@ import (
 )
 
 var (
-	ServerMap     map[string]config.Server
 	redirectCache redirect.Cache
 )
 
 func init() {
-	ServerMap = make(map[string]config.Server)
-	redirectCache = redirect.NewInMemoryCache() // TODO move it to the configuration
+	redirectCache = redirect.NewInMemoryCache() // TODO allow config to choose which caching needs to be used
 }
 
 // BuildRules builds the additional structures for the redirect rules
 func BuildRules() {
-	buildRedirectMap()
 	BuildRegexRules()
 	BuildHashRules()
 }
 
-func buildRedirectMap() {
-	for _, server := range config.Config.Proxy.Servers {
-		ServerMap[server.Id] = server
-	}
-}
-
 // FindRedirect finds the first (hash then regex) rule that matches the query
-func FindRedirect(query string, hash string) config.Server {
+func FindRedirect(query string, hash string) string {
 	// first search in cache
 	cachedServer, foundInCache := redirectCache.Find(hash)
 	if foundInCache {
@@ -40,21 +31,21 @@ func FindRedirect(query string, hash string) config.Server {
 	// search in hash rules
 	hashRule, hashRuleHit := FindHashRule(hash)
 	if hashRuleHit {
-		redirectCache.Add(hash, hashRule.Target)
-		return hashRule.Target
+		redirectCache.Add(hash, hashRule.TargetGroup)
+		return hashRule.TargetGroup
 	}
 
 	// if none of the hash rules match, then check the regex rules
 	regexRule, regexRuleHit := FindRegexRule(query)
 	if regexRuleHit {
 		log.Logger.Tracef("Regex rule found for query: %s", query)
-		redirectCache.Add(hash, regexRule.Target)
-		return regexRule.Target
+		redirectCache.Add(hash, regexRule.TargetGroup)
+		return regexRule.TargetGroup
 	}
 
 	// add hash to cache
-	redirectCache.Add(hash, *config.Config.Proxy.DefaultServer)
+	redirectCache.Add(hash, config.Config.Proxy.DefaultServer.ServerGroup)
 
-	// if none of the rules matched then return the default server
-	return *config.Config.Proxy.DefaultServer
+	// if none of the rules matched then return the default db
+	return config.Config.Proxy.DefaultServer.ServerGroup
 }

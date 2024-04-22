@@ -10,10 +10,10 @@ var (
 )
 
 type RegexRule struct {
-	Rule   config.Rule
-	Regex  string
-	Regexp *regexp.Regexp
-	Target config.Server
+	Rule        config.Rule
+	Regex       string
+	Regexp      *regexp.Regexp
+	TargetGroup string
 }
 
 func (regexRule *RegexRule) Match(text string) bool {
@@ -29,9 +29,9 @@ func BuildRegexRules() {
 	for _, rule := range config.Config.Proxy.Rules {
 		if rule.Regex != "" {
 			r := RegexRule{
-				Rule:   rule,
-				Regex:  rule.Regex,
-				Target: ServerMap[rule.Target],
+				Rule:        rule,
+				Regex:       rule.Regex,
+				TargetGroup: rule.Target,
 			}
 			r.compile()
 			RegexRules = append(RegexRules, r)
