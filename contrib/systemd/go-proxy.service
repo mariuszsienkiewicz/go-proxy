@@ -1,0 +1,25 @@
+[Unit]
+Description=Go-Proxy
+After=network.target
+
+###
+# You can setup the database service dependencies (unless you use dockerized database)
+###
+# mariadb service
+#Wants=mariadb.service
+#After=mariadb.service
+# redis cache service
+#Wants=redis.service
+#After=redis.service
+#
+
+[Service]
+RestartSec=2
+Type=simple
+WorkingDirectory=/var/lib/go-proxy/
+
+ExecStart=/usr/local/bin/go-proxy proxy --config /etc/go-proxy/config.yml
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

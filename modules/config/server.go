@@ -32,21 +32,17 @@ func (server *Server) GetUser() (DbUser, error) {
 }
 
 func ValidateServerConfiguration() error {
-	// setup default db in configuration
+	// check if there is default db in configuration
+	isAnyServerDefault := false
 	for _, server := range Config.Proxy.Servers {
 		if server.Default {
-			Config.Proxy.DefaultServer = &server
+			isAnyServerDefault = true
+			break
 		}
 	}
 
-	// if default db was not in the config
-	if Config.Proxy.DefaultServer == nil {
-		// set automatically default db if there is only one db in configuration
-		if len(Config.Proxy.Servers) == 1 {
-			Config.Proxy.DefaultServer = &Config.Proxy.Servers[0]
-		} else {
-			return errors.New("none of the servers has 'default' property set as true")
-		}
+	if !isAnyServerDefault {
+		return errors.New("no default server")
 	}
 
 	// TODO check if group exists

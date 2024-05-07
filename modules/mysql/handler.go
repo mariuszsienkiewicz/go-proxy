@@ -32,13 +32,14 @@ func (h *ProxyHandler) HandleQuery(query string) (*mysql.Result, error) {
 	if groupFound == false {
 		log.Logger.Tracef("Target group: %v", targetGroup)
 		log.Logger.Tracef("Groups: %v", db.Groups)
-		return nil, errors.New("group to use not found")
+		return nil, errors.New("proxy error")
 	}
 
 	// get server that should be used for this query
 	target, errRandomServer := serverGroup.GetRandomServer()
 	if errRandomServer != nil {
-		return nil, errRandomServer
+		log.Logger.Errorf("Error while getting random server: %v", errRandomServer)
+		return nil, errors.New("proxy error")
 	}
 	log.Logger.Tracef("Query \"%v\" will be redirected to: %v (Host: %v, Hash: %s)", normalizedQuery, target.Config.Id, target.Config.GetDsn(), hash)
 

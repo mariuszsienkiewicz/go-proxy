@@ -28,6 +28,9 @@ func runProxy(ctx *cli.Context) error {
 		log.Logger.Fatal(setupError)
 	}
 
+	log.Logger.Tracef("Monitoring starting up...")
+	db.MonitorServers(ctx.Context)
+
 	log.Logger.Tracef("Proxy is ready, serving")
 	serve(ctx.Context)
 
@@ -105,6 +108,7 @@ func handleConnection(ctx context.Context, c net.Conn) {
 		default:
 			if err := conn.HandleCommand(); err != nil {
 				log.Logger.Error(err)
+				return
 			}
 		}
 	}

@@ -3,7 +3,7 @@ version: '3'
 services:
   main:
     image: mysql:latest
-    command: --default-authentication-plugin=mysql_native_password
+    command: --mysql-native-password=ON
     container_name: main_db
     volumes:
       - ./main/cnf:/etc/mysql/conf.d
@@ -21,12 +21,12 @@ services:
       GOPROXY_REPLICATION_USER: 'repluser'
       GOPROXY_REPLICATION_PASSWORD: 'replpass'
 
-  replica:
+  replica_1:
     image: mysql:latest
-    command: --default-authentication-plugin=mysql_native_password
-    container_name: replica_db
+    command: --mysql-native-password=ON
+    container_name: replica_1_db
     volumes:
-      - ./replica/cnf:/etc/mysql/conf.d
+      - ./replica_1/cnf:/etc/mysql/conf.d
       - ./replica/setup:/setup
     ports:
       - "7033:3306"
@@ -41,3 +41,27 @@ services:
       GOPROXY_REPLICATION_USER: 'repluser'
       GOPROXY_REPLICATION_PASSWORD: 'replpass'
       GOPROXY_MASTER_HOSTNAME: 'main_db'
+
+  replica_2:
+    image: mysql:latest
+    command: --mysql-native-password=ON
+    container_name: replica_2_db
+    volumes:
+      - ./replica_2/cnf:/etc/mysql/conf.d
+      - ./replica/setup:/setup
+    ports:
+      - "8033:3306"
+    restart: always
+    environment:
+      # mysql image environment variables
+      MYSQL_ROOT_PASSWORD: 'rootpass'
+      MYSQL_DATABASE: 'db'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'userpass'
+      # environment variables for go-proxy
+      GOPROXY_REPLICATION_USER: 'repluser'
+      GOPROXY_REPLICATION_PASSWORD: 'replpass'
+      GOPROXY_MASTER_HOSTNAME: 'main_db'
+
+  #prestashop:
+  #  image: prestashop:latest

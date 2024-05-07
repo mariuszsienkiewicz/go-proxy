@@ -8,7 +8,8 @@ var (
 
 // Pool - populated by LoadServers
 type Pool struct {
-	Servers map[string]*Server
+	Servers       map[string]*Server
+	DefaultServer *Server
 }
 
 func init() {

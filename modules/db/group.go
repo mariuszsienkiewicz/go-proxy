@@ -5,7 +5,6 @@ import (
 	"math/rand"
 	"proxy/modules/config"
 	"proxy/modules/log"
-	"time"
 )
 
 // TODO add ServerGroupId
@@ -53,19 +52,31 @@ func (g *Group) AddServer(server *Server) {
 	log.Logger.Tracef("New server added, group: %v", g)
 }
 
+// GetRandomServer TODO - if no servers are available use fallback, and if fallback is dead too then use default server
 func (g *Group) GetRandomServer() (*Server, error) {
-	log.Logger.Tracef("Looking for random server, available servers: %v, group: %v", g.serverIds, g)
+	log.Logger.Tracef("Looking for random server in group: %v", g)
 	if len(g.serverIds) == 0 {
-		return nil, fmt.Errorf("no servers found")
+		log.Logger.Tracef("No servers found in group: %v, using default server", g)
+		return DbPool.DefaultServer, nil
 	}
 
-	rand.Seed(time.Now().UnixNano())
-	index := rand.Intn(len(g.serverIds))
-
-	s, found := g.servers[g.serverIds[index]]
-	if found == false {
-		return nil, fmt.Errorf("server %s not found", g.serverIds[index])
+	// TODO - perf issue
+	var activeServerIds []string
+	for _, serverID := range g.serverIds {
+		if server, found := g.servers[serverID]; found && server.Status == OPERATIONAL {
+			activeServerIds = append(activeServerIds, serverID)
+		}
 	}
+
+	log.Logger.Tracef("Available servers: %v", activeServerIds)
+	if len(activeServerIds) == 0 {
+		log.Logger.Tracef("There is no operational server in group: %v, using default server", g)
+		return DbPool.DefaultServer, nil
+	}
+
+	index := rand.Intn(len(activeServerIds))
+
+	s := g.servers[activeServerIds[index]]
 
 	return s, nil
 }

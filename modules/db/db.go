@@ -5,7 +5,7 @@ import (
 	"proxy/modules/log"
 )
 
-// Init - should be loaded in logic order, groups -> servers -> pool
+// Init - should be loaded in logic order, groups -> Servers -> pool
 func Init() error {
 	if err := LoadGroups(); err != nil {
 		return err
@@ -24,7 +24,7 @@ func Init() error {
 }
 
 func TestServerConfig() error {
-	// test if servers have the user that they can use
+	// test if Servers have the user that they can use
 	for _, server := range DbPool.Servers {
 		if _, err := server.Config.GetUser(); err != nil {
 			return err
@@ -34,7 +34,7 @@ func TestServerConfig() error {
 	return nil
 }
 
-// TestRequiredServers tests if all the servers that are required are available
+// TestRequiredServers tests if all the Servers that are required are available
 func TestRequiredServers() error {
 	for id, server := range DbPool.Servers {
 		if server.Config.Required {

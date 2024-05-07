@@ -2,7 +2,7 @@ package redirect
 
 import (
 	"proxy/modules/cache/redirect"
-	"proxy/modules/config"
+	"proxy/modules/db"
 	"proxy/modules/log"
 )
 
@@ -31,6 +31,7 @@ func FindRedirect(query string, hash string) string {
 	// search in hash rules
 	hashRule, hashRuleHit := FindHashRule(hash)
 	if hashRuleHit {
+		log.Logger.Tracef("Hash rule found for query: %s", query)
 		redirectCache.Add(hash, hashRule.TargetGroup)
 		return hashRule.TargetGroup
 	}
@@ -44,8 +45,9 @@ func FindRedirect(query string, hash string) string {
 	}
 
 	// add hash to cache
-	redirectCache.Add(hash, config.Config.Proxy.DefaultServer.ServerGroup)
+	log.Logger.Tracef("No rule found for query: %s, use default server", query)
+	redirectCache.Add(hash, db.DbPool.DefaultServer.Config.ServerGroup)
 
 	// if none of the rules matched then return the default db
-	return config.Config.Proxy.DefaultServer.ServerGroup
+	return db.DbPool.DefaultServer.Config.ServerGroup
 }

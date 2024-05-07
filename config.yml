@@ -1,6 +1,6 @@
 proxy:
   basics:
-    host: "127.0.0.1"
+    host: "localhost"
     port: 1234
   server_groups:
     - id: "RS"
@@ -8,18 +8,23 @@ proxy:
     - id: "WS"
       type: P
   servers:
-    - name: "PRIMARY"
-      id: "P1"
+    - id: "P1"
+      name: "PRIMARY"
       host: "localhost"
       port: 6033
       required: true
       test_db: "db"
       default: true
       server_group: "WS"
-    - name: "REPLICA"
-      id: "R1"
+    - id: "R1"
+      name: "REPLICA 1"
       host: "localhost"
       port: 7033
+      server_group: "RS"
+    - id: "R2"
+      name: "REPLICA 2"
+      host: "localhost"
+      port: 8033
       server_group: "RS"
   rules:
     - name: "REDIRECT SELECT FOR UPDATE QUERIES TO PRIMARY"
@@ -39,5 +44,8 @@ proxy:
       user: "user"
       password: "userpass"
     - target: "R1"
+      user: "user"
+      password: "userpass"
+    - target: "R2"
       user: "user"
       password: "userpass"

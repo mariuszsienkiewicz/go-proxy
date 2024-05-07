@@ -25,7 +25,10 @@ func LoadServers() error {
 		}
 
 		g.AddServer(s)
-		DbPool.Servers[server.Name] = s
+		DbPool.Servers[server.Id] = s
+		if s.Config.Default {
+			DbPool.DefaultServer = s
+		}
 	}
 
 	return nil

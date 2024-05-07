@@ -39,13 +39,12 @@ target_id: "R1"
 
 ### Mandatory
 
-- [ ] Docs
+- [x] Group of servers
+    - [x] Implement ge random server from group
+- [ ] Monitor MySQL servers
+- [ ] Check if current query transaction is in transaction
+- [ ] Add Redis Cache
 - [ ] Add SQLite to save stats and other data
-- [ ] Make In-Memory redirect cache optional (in configuration file)
-
-### Nice to have
-
-- [ ] Redis Cache (redirect cache)
 
 ## Configuration
 
@@ -59,14 +58,14 @@ proxy:
   access: # MySQL protocol access user to go-proxy  
     user: "user"
     password: ""
-  servers: # primary/replica server definition
-    - name: "PRIMARY" # name of the server 
-      id: "P1" # id of the server (it has to be unique)
-      host: "192.168.250.230" # host on which MySQL server operates
-      port: 3306 # port of communication with MySQL server
-      required: true # if is required then go-proxy won't start up if MySQL server is down
+  servers: # primary/replica_1 db definition
+    - name: "PRIMARY" # name of the db 
+      id: "P1" # id of the db (it has to be unique)
+      host: "192.168.250.230" # host on which MySQL db operates
+      port: 3306 # port of communication with MySQL db
+      required: true # if is required then go-proxy won't start up if MySQL db is down
       test_db: "test" # db used for test of communication
-      default: true # if set to true then every query that doesn't hit query rule will be redirected to this server
+      default: true # if set to true then every query that doesn't hit query rule will be redirected to this db
     - name: "REPLICA" 
       id: "R1"
       host: "192.168.250.230"
@@ -74,7 +73,7 @@ proxy:
   rules:
     - name: "REDIRECT SELECT FOR UPDATE QUERIES TO PRIMARY" # name of the query
       regex_rule: "^SELECT FOR UPDATE.*" # regex rule - regexp definition of rule  
-      target_id: "P1" # to which server this rule should direct   
+      target_id: "P1" # to which db this rule should direct   
     - name: "REDIRECT SELECT QUERIES TO REPLICA" 
       regex_rule: "^SELECT.*"
       target_id: "R1"
@@ -82,7 +81,7 @@ proxy:
       hash_rule: "3c343df0eb5b1832b1c8443e63340718dae9c8dbaaa43193e3db435d40dffe94" # hash rule - SHA-256 representation of normalized query
       target_id: "R1"
   db_users:
-    - target: "P1" # which server has this user 
+    - target: "P1" # which db has this user 
       user: "root"
       password: "passwd"
     - target: "R1"
