@@ -1,6 +1,6 @@
 proxy:
   basics:
-    host: "localhost"
+    host: "127.0.0.1"
     port: 1234
   server_groups:
     - id: "RS"
@@ -38,7 +38,7 @@ proxy:
       target_id: "RS"
   access:
     user: "user"
-    password: ""
+    password: "pass"
   db_users:
     - target: "P1"
       user: "user"

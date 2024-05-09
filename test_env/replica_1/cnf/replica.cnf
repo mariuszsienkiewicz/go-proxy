@@ -1,2 +1,3 @@
 [mysqld]
 server_id=2
+sql-mode=""

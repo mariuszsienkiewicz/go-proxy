@@ -41,7 +41,8 @@ target_id: "R1"
 
 - [x] Group of servers
     - [x] Implement ge random server from group
-- [ ] Monitor MySQL servers
+- [x] Monitor MySQL servers
+- [ ] Connection Pooling
 - [ ] Check if current query transaction is in transaction
 - [ ] Add Redis Cache
 - [ ] Add SQLite to save stats and other data
@@ -65,20 +66,20 @@ proxy:
       port: 3306 # port of communication with MySQL db
       required: true # if is required then go-proxy won't start up if MySQL db is down
       test_db: "test" # db used for test of communication
-      default: true # if set to true then every query that doesn't hit query rule will be redirected to this db
+      default: true # if set to true then every util that doesn't hit util rule will be redirected to this db
     - name: "REPLICA" 
       id: "R1"
       host: "192.168.250.230"
       port: 3306
   rules:
-    - name: "REDIRECT SELECT FOR UPDATE QUERIES TO PRIMARY" # name of the query
+    - name: "REDIRECT SELECT FOR UPDATE QUERIES TO PRIMARY" # name of the util
       regex_rule: "^SELECT FOR UPDATE.*" # regex rule - regexp definition of rule  
       target_id: "P1" # to which db this rule should direct   
     - name: "REDIRECT SELECT QUERIES TO REPLICA" 
       regex_rule: "^SELECT.*"
       target_id: "R1"
     - name: "SELECT * FROM versions WHERE major=?"
-      hash_rule: "3c343df0eb5b1832b1c8443e63340718dae9c8dbaaa43193e3db435d40dffe94" # hash rule - SHA-256 representation of normalized query
+      hash_rule: "3c343df0eb5b1832b1c8443e63340718dae9c8dbaaa43193e3db435d40dffe94" # hash rule - SHA-256 representation of normalized util
       target_id: "R1"
   db_users:
     - target: "P1" # which db has this user 

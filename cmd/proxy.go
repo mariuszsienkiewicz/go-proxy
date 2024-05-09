@@ -51,8 +51,6 @@ func setup() error {
 }
 
 func serve(ctx context.Context) {
-	log.Logger.Infof("Proxy is running on: %v", config.Config.Proxy.Basics.GetHostname())
-
 	// create TCP listener
 	l, err := net.Listen("tcp", config.Config.Proxy.Basics.GetHostname())
 	log.Logger.Infof("Listening on: %v", config.Config.Proxy.Basics.GetHostname())
@@ -90,7 +88,11 @@ func serve(ctx context.Context) {
 
 func handleConnection(ctx context.Context, c net.Conn) {
 	log.Logger.Infof("Handle connection: %v", config.Config.Proxy.Basics.GetHostname())
-	conn, err := server.NewConn(c, config.Config.Proxy.Access.User, config.Config.Proxy.Access.Password, &mysql.ProxyHandler{})
+
+	handler := mysql.NewProxyHandler()
+	defer handler.ReturnConnectionsToPool()
+
+	conn, err := server.NewConn(c, config.Config.Proxy.Access.User, config.Config.Proxy.Access.Password, handler)
 	if err != nil {
 		log.Logger.Fatal(err)
 	}
@@ -99,7 +101,7 @@ func handleConnection(ctx context.Context, c net.Conn) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Logger.Tracef("Closing connection with the client")
+			log.Logger.Trace("Closing connection with the client")
 			err := c.Close()
 			if err != nil {
 				log.Logger.Error(err)
@@ -107,7 +109,8 @@ func handleConnection(ctx context.Context, c net.Conn) {
 			return
 		default:
 			if err := conn.HandleCommand(); err != nil {
-				log.Logger.Error(err)
+				log.Logger.Infof("Closing connection handler, reason: %s", err)
+				log.Logger.Infof("%v")
 				return
 			}
 		}

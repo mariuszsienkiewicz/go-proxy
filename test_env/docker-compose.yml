@@ -3,7 +3,7 @@ version: '3'
 services:
   main:
     image: mysql:latest
-    command: --mysql-native-password=ON
+    command: --mysql-native-password=ON --sql-mode=
     container_name: main_db
     volumes:
       - ./main/cnf:/etc/mysql/conf.d
@@ -23,7 +23,7 @@ services:
 
   replica_1:
     image: mysql:latest
-    command: --mysql-native-password=ON
+    command: --mysql-native-password=ON --sql-mode=
     container_name: replica_1_db
     volumes:
       - ./replica_1/cnf:/etc/mysql/conf.d
@@ -44,7 +44,7 @@ services:
 
   replica_2:
     image: mysql:latest
-    command: --mysql-native-password=ON
+    command: --mysql-native-password=ON --sql-mode=
     container_name: replica_2_db
     volumes:
       - ./replica_2/cnf:/etc/mysql/conf.d
