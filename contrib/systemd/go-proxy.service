@@ -3,7 +3,7 @@ Description=Go-Proxy
 After=network.target
 
 ###
-# You can setup the database service dependencies (unless you use dockerized database)
+# You can setup the database service dependencies (unless you use dockerized/remote database)
 ###
 # mariadb service
 #Wants=mariadb.service
