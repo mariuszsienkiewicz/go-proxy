@@ -11,7 +11,7 @@ var (
 
 type RegexRule struct {
 	Rule        config.Rule
-	Regex       string
+	Pattern     string
 	Regexp      *regexp.Regexp
 	TargetGroup string
 }
@@ -21,7 +21,7 @@ func (regexRule *RegexRule) Match(text string) bool {
 }
 
 func (regexRule *RegexRule) compile() {
-	compiled, _ := regexp.Compile(regexRule.Regex)
+	compiled, _ := regexp.Compile(regexRule.Pattern)
 	regexRule.Regexp = compiled
 }
 
@@ -30,7 +30,7 @@ func BuildRegexRules() {
 		if rule.Regex != "" {
 			r := RegexRule{
 				Rule:        rule,
-				Regex:       rule.Regex,
+				Pattern:     rule.Regex,
 				TargetGroup: rule.Target,
 			}
 			r.compile()
