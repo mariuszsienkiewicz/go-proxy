@@ -4,14 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-mysql-org/go-mysql/client"
-	"github.com/go-sql-driver/mysql"
 	"proxy/modules/config"
 	"proxy/modules/log"
 	"time"
 )
 
 type Server struct {
-	Dsn         string
 	Config      config.Server
 	Credentials config.DbUser
 	Status      Status
@@ -46,17 +44,9 @@ func NewServer(server config.Server) (*Server, error) {
 		return &Server{}, err
 	}
 
-	cfg := mysql.Config{
-		User:   user.User,
-		Passwd: user.Password,
-		Net:    "tcp",
-		Addr:   fmt.Sprintf("%s:%d", server.Host, server.Port),
-	}
-
 	pool := client.NewPool(log.Logger.Tracef, 100, 400, 5, fmt.Sprintf("%s:%d", server.Host, server.Port), user.User, user.Password, "")
 
 	return &Server{
-		Dsn:         cfg.FormatDSN(),
 		Config:      server,
 		Credentials: user,
 		Status:      SHUNNED, // by default, it has to be checked first
