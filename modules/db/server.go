@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-mysql-org/go-mysql/client"
-	"proxy/modules/config"
-	"proxy/modules/log"
+	"go-proxy/modules/config"
+	"go-proxy/modules/log"
 	"time"
 )
 
@@ -16,14 +16,21 @@ type Server struct {
 	Pool        *client.Pool
 }
 
-func LoadServers() error {
+func LoadServers(ctx context.Context) error {
 	for _, server := range config.Config.Proxy.Servers {
+		// Check if the context is done
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+		}
+
 		g, groupExists := Groups[server.ServerGroup]
 		if groupExists == false {
 			return fmt.Errorf("server group %s does not exist", server.ServerGroup)
 		}
 
-		s, err := NewServer(server)
+		s, err := NewServer(ctx, server)
 		if err != nil {
 			return err
 		}
@@ -38,27 +45,36 @@ func LoadServers() error {
 	return nil
 }
 
-func NewServer(server config.Server) (*Server, error) {
+func NewServer(ctx context.Context, server config.Server) (*Server, error) {
 	user, err := server.GetUser()
 	if err != nil {
 		return &Server{}, err
 	}
 
-	pool := client.NewPool(log.Logger.Tracef, 100, 400, 5, fmt.Sprintf("%s:%d", server.Host, server.Port), user.User, user.Password, "")
+	pool := client.NewPool(log.InfoWeak, 80, 150, 10, fmt.Sprintf("%s:%d", server.Host, server.Port), user.User, user.Password, "")
 
-	return &Server{
+	// Create a server instance
+	s := &Server{
 		Config:      server,
 		Credentials: user,
 		Status:      SHUNNED, // by default, it has to be checked first
 		Pool:        pool,
-	}, nil
+	}
+
+	// Run a goroutine to close the pool when the context is done
+	go func() {
+		<-ctx.Done()
+		s.Pool.Close()
+	}()
+
+	return s, nil
 }
 
-func (s *Server) TestConnection() error {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), 1*time.Second)
+func (s *Server) TestConnection(ctx context.Context) error {
+	ctxWithTimeout, ctxCancel := context.WithTimeout(ctx, 60000*time.Second)
 	defer ctxCancel()
 
-	conn, err := s.Pool.GetConn(ctx)
+	conn, err := s.Pool.GetConn(ctxWithTimeout)
 	if err != nil {
 		return err
 	}
@@ -76,9 +92,7 @@ func (s *Server) TestConnection() error {
 	return nil
 }
 
-func (s *Server) Connect() (*client.Conn, error) {
-	ctx := context.WithoutCancel(context.Background())
-
+func (s *Server) Connect(ctx context.Context) (*client.Conn, error) {
 	conn, err := s.Pool.GetConn(ctx)
 	if err != nil {
 		return &client.Conn{}, err

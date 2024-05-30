@@ -2,6 +2,15 @@ proxy:
   basics:
     host: "127.0.0.1"
     port: 1234
+  cache:
+    type: memory
+    redis:
+      host: "127.0.0.1"
+      port: 6380
+      password: ""
+      database: 0 # redis default
+    memory:
+      capacity: 1000
   server_groups:
     - id: "RS"
       type: R

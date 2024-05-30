@@ -42,9 +42,9 @@ target_id: "R1"
 - [x] Group of servers
     - [x] Implement ge random server from group
 - [x] Monitor MySQL servers
-- [ ] Connection Pooling
-- [ ] Check if current query transaction is in transaction
-- [ ] Add Redis Cache
+- [x] Connection Pooling
+- [x] Check if current query transaction is in transaction
+- [x] Add Redis Cache
 - [ ] Add SQLite to save stats and other data
 
 ## Configuration
@@ -90,3 +90,44 @@ proxy:
       password: "passwd"
 ```
 
+## Installation
+
+Compile the project:
+
+```shell
+go build
+chmod +x go-proxy
+mv go-proxy /usr/local/bin
+```
+
+Add go-proxy user:
+
+```shell
+adduser \
+   --system \
+   --shell /bin/bash \
+   --gecos 'Go Proxy user' \
+   --group \
+   --disabled-password \
+   --home /home/go-proxy \
+   go-proxy
+```
+
+Add required directory structure:
+
+```shell
+mkdir /etc/go-proxy
+chown root:go-proxy /etc/go-proxy
+chmod 770 /etc/go-proxy
+```
+
+Create your own config file and name it `config.yml` and then move to the `/etc/go-proxy` directory.
+
+Set directory to read only:
+
+```shell
+chmod 750 /etc/go-proxy
+chmod 640 /etc/go-proxy/config.yml
+```
+
+Add service using the `contrib\systemd\go-proxy.service`.

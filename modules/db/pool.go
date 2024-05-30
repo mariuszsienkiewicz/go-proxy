@@ -13,6 +13,10 @@ type Pool struct {
 }
 
 func init() {
+	CreatePool()
+}
+
+func CreatePool() {
 	DbPool = Pool{
 		Servers: make(map[string]*Server),
 	}

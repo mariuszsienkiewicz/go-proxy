@@ -1,26 +1,35 @@
 package db
 
 import (
+	"context"
 	"fmt"
-	"proxy/modules/log"
+	"go-proxy/modules/log"
+	"go.uber.org/zap"
 )
 
 // Init - should be loaded in logic order, groups -> Servers -> pool
-func Init() error {
+func Init(ctx context.Context) error {
+	setup() // clear everything before loading
+
 	if err := LoadGroups(); err != nil {
 		return err
 	}
-	if err := LoadServers(); err != nil {
+	if err := LoadServers(ctx); err != nil {
 		return err
 	}
 	if err := TestServerConfig(); err != nil {
 		return err
 	}
-	if err := TestRequiredServers(); err != nil {
+	if err := TestRequiredServers(ctx); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func setup() {
+	CreateGroups()
+	CreatePool()
 }
 
 func TestServerConfig() error {
@@ -35,17 +44,15 @@ func TestServerConfig() error {
 }
 
 // TestRequiredServers tests if all the Servers that are required are available
-func TestRequiredServers() error {
+func TestRequiredServers(ctx context.Context) error {
 	for id, server := range DbPool.Servers {
 		if server.Config.Required {
-			log.Logger.Tracef("Server %v is required, checking connectivity via %v", id, server.Config.GetDsn())
-			if err := server.TestConnection(); err != nil {
+			log.Logger.Debug("server is required, checking connectivity", zap.String("server_id", id), zap.String("dsn", server.Config.GetDsn()))
+			if err := server.TestConnection(ctx); err != nil {
 				return fmt.Errorf("error encountered while attempting to test connection with the required db - %s", err.Error())
 			} else {
 				server.Status = OPERATIONAL
 			}
-
-			log.Logger.Tracef("Server %v is recheable", id)
 		}
 	}
 

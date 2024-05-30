@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"github.com/urfave/cli/v2"
+	"go-proxy/cmd"
+	"go-proxy/modules/log"
+	"go.uber.org/zap"
+	_ "net/http/pprof"
 	"os"
 	"os/signal"
-	"proxy/cmd"
-	"proxy/modules/log"
 	"syscall"
 )
 
@@ -19,8 +21,18 @@ func main() {
 	// setup logger
 	log.SetLogger()
 
+	// Start HTTP server for pprof
+	// http://localhost:6060/debug/pprof/profile?seconds=30
+	//go func() {
+	//	log.Logger.Info("Starting pprof server on :6060")
+	//	err := http.ListenAndServe("localhost:6060", nil)
+	//	if err != nil {
+	//		return
+	//	}
+	//}()
+
 	// setup app
-	log.Logger.Trace("Creating the app")
+	log.Logger.Info("Creating the app")
 	app := cmd.NewProxyApp()
 
 	// setup signal watcher
@@ -33,10 +45,10 @@ func main() {
 				switch sig {
 				case syscall.SIGHUP:
 					// reloading config requires the app to restart
-					log.Logger.Infof("Signal: SIGHUP received, reloading config.")
+					log.Logger.Info("Signal: SIGHUP received, reloading config.")
 					cancel()
 				case syscall.SIGTERM, syscall.SIGINT:
-					log.Logger.Infof("Signal %s received, exiting.", sig.String())
+					log.Logger.Info("Exit signal received, exiting.", zap.String("signal", sig.String()))
 					cancel()
 					os.Exit(1)
 				}
@@ -53,7 +65,7 @@ func main() {
 }
 
 func getNewContext() (context.Context, context.CancelFunc) {
-	log.Logger.Tracef("Creating new cancelable context")
+	log.Logger.Debug("Creating new cancelable context")
 	newCtx, cancelFunc := context.WithCancel(context.Background())
 
 	return newCtx, cancelFunc
@@ -61,10 +73,10 @@ func getNewContext() (context.Context, context.CancelFunc) {
 
 // run the app, exit on failure
 func run(app *cli.App) {
-	log.Logger.Trace("Running the app")
+	log.Logger.Debug("Running the app")
 	ctx, cancel = getNewContext()
 	if err := cmd.RunProxyApp(ctx, app, os.Args...); err != nil {
-		log.Logger.Errorf("%s\n", err)
+		log.Logger.Debug("Error while running the proxy app", zap.Error(err))
 		os.Exit(1)
 	}
 }

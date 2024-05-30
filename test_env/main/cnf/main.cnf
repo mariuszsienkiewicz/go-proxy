@@ -1,4 +1,4 @@
 [mysqld]
 server_id=1
-replicate-do-db=db
-sql-mode=""
+binlog_do_db=db
+sql_mode=""

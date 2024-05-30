@@ -3,7 +3,8 @@ package cmd
 import (
 	"context"
 	"github.com/urfave/cli/v2"
-	"proxy/modules/log"
+	"go-proxy/modules/log"
+	"go.uber.org/zap"
 )
 
 func NewProxyApp() *cli.App {
@@ -33,7 +34,7 @@ func RunProxyApp(ctx context.Context, app *cli.App, args ...string) error {
 			if err == nil {
 				return nil
 			} else {
-				log.Logger.Error(err)
+				log.Logger.Error("Run Proxy App failed", zap.Error(err))
 			}
 		}
 	}

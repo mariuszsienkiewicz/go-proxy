@@ -1,7 +1,7 @@
 package redirect
 
 import (
-	"proxy/modules/config"
+	"go-proxy/modules/config"
 )
 
 type HashRule struct {

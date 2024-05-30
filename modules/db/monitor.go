@@ -2,7 +2,8 @@ package db
 
 import (
 	"context"
-	"proxy/modules/log"
+	"go-proxy/modules/log"
+	"go.uber.org/zap"
 	"time"
 )
 
@@ -14,21 +15,21 @@ func MonitorServers(ctx context.Context) {
 		for {
 			select {
 			case <-ctx.Done():
-				log.Logger.Tracef("Context canceled, shutting down the server monitoring")
+				log.Logger.Info("Context canceled, shutting down the server monitoring")
 				return
 			default:
 				for range ticker.C {
 					for _, server := range DbPool.Servers {
-						log.Logger.Tracef("Monitoring server: %s", server.Config.Id)
-						err := server.TestConnection()
+						//log.Logger.Debugf("Monitoring server: %s", server.Config.Id)
+						err := server.TestConnection(ctx)
 						if err != nil {
 							server.Status = SHUNNED
-							log.Logger.Tracef("No connection with the server %s, server is shunned", err)
+							log.Logger.Warn("No connection with the server, server is shunned", zap.NamedError("reason", err))
 						} else {
 							server.Status = OPERATIONAL
 						}
 					}
-					log.Logger.Tracef("Server: %v", DbPool.Servers)
+					// log.Logger.Debugf("server: %v", DbPool.Servers)
 				}
 			}
 		}
