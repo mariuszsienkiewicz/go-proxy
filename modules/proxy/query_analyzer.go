@@ -27,23 +27,22 @@ func Analyze(query string) SQLCommand {
 		return SQLCommand{Type: Unknown}
 	}
 
-	if command, found := AnalyzeSetNamesCharset(query); found {
+	if command, found := analyzePrefixedCommand(query, "SET NAMES", SetNames); found {
 		return command
 	}
 
-	if command, found := AnalyzeUseDatabase(query); found {
+	if command, found := analyzePrefixedCommand(query, "USE", UseDatabase); found {
 		return command
 	}
 
 	return SQLCommand{Type: Unknown}
 }
 
-// AnalyzeSetNamesCharset extracts the charset from a SET NAMES SQL query.
-// Returns an SQLCommand with the charset if the query matches the SET NAMES pattern.
-func AnalyzeSetNamesCharset(query string) (SQLCommand, bool) {
-	const setNamesPrefix = "SET NAMES"
+// analyzePrefixedCommand extracts the value from an SQL query if it matches the given prefix case-insensitively.
+// Returns an SQLCommand with the given command type and the value if the query matches the pattern.
+func analyzePrefixedCommand(query, prefix string, commandType CommandType) (SQLCommand, bool) {
 	queryLen := len(query)
-	prefixLen := len(setNamesPrefix)
+	prefixLen := len(prefix)
 
 	i, j := 0, 0
 
@@ -52,9 +51,9 @@ func AnalyzeSetNamesCharset(query string) (SQLCommand, bool) {
 		i++
 	}
 
-	// Compare SET NAMES case-insensitively
+	// Compare prefix case-insensitively
 	for j < prefixLen && i < queryLen {
-		if unicode.ToUpper(rune(query[i])) != rune(setNamesPrefix[j]) {
+		if unicode.ToUpper(rune(query[i])) != rune(prefix[j]) {
 			return SQLCommand{}, false
 		}
 		i++
@@ -66,55 +65,14 @@ func AnalyzeSetNamesCharset(query string) (SQLCommand, bool) {
 		return SQLCommand{}, false
 	}
 
-	// Skip any spaces after SET NAMES
+	// Skip any spaces after the prefix
 	for i < queryLen && unicode.IsSpace(rune(query[i])) {
 		i++
 	}
 
-	// The remaining part is the charset value
+	// The remaining part is the value
 	if i < queryLen {
-		return SQLCommand{Type: SetNames, Value: query[i:]}, true
-	}
-
-	return SQLCommand{}, false
-}
-
-// AnalyzeUseDatabase extracts the database name from a USE SQL query.
-// Returns an SQLCommand with the database name if the query matches the USE pattern.
-func AnalyzeUseDatabase(query string) (SQLCommand, bool) {
-	const usePrefix = "USE"
-	queryLen := len(query)
-	prefixLen := len(usePrefix)
-
-	i, j := 0, 0
-
-	// Skip leading spaces
-	for i < queryLen && unicode.IsSpace(rune(query[i])) {
-		i++
-	}
-
-	// Compare USE case-insensitively
-	for j < prefixLen && i < queryLen {
-		if unicode.ToUpper(rune(query[i])) != rune(usePrefix[j]) {
-			return SQLCommand{}, false
-		}
-		i++
-		j++
-	}
-
-	// Ensure the entire prefix was matched
-	if j != prefixLen {
-		return SQLCommand{}, false
-	}
-
-	// Skip any spaces after USE
-	for i < queryLen && unicode.IsSpace(rune(query[i])) {
-		i++
-	}
-
-	// The remaining part is the database name
-	if i < queryLen {
-		return SQLCommand{Type: UseDatabase, Value: query[i:]}, true
+		return SQLCommand{Type: commandType, Value: query[i:]}, true
 	}
 
 	return SQLCommand{}, false
