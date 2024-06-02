@@ -20,7 +20,6 @@ func MonitorServers(ctx context.Context) {
 			default:
 				for range ticker.C {
 					for _, server := range DbPool.Servers {
-						//log.Logger.Debugf("Monitoring server: %s", server.Config.Id)
 						err := server.TestConnection(ctx)
 						if err != nil {
 							server.Status = SHUNNED
@@ -29,7 +28,6 @@ func MonitorServers(ctx context.Context) {
 							server.Status = OPERATIONAL
 						}
 					}
-					// log.Logger.Debugf("server: %v", DbPool.Servers)
 				}
 			}
 		}

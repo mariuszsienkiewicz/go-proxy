@@ -8,8 +8,6 @@ import (
 	"math/rand"
 )
 
-// TODO add ServerGroupId
-
 type Group struct {
 	Id        string
 	servers   map[string]*Server
@@ -59,7 +57,6 @@ func (g *Group) AddServer(server *Server) {
 	log.Logger.Debug("New server added, group", zap.String("group", server.Config.Id))
 }
 
-// GetRandomServer TODO - if no servers are available use fallback, and if fallback is dead too then use default server
 func (g *Group) GetRandomServer() (*Server, error) {
 	log.Logger.Debug("Looking for random server")
 	if len(g.serverIds) == 0 {
@@ -67,7 +64,6 @@ func (g *Group) GetRandomServer() (*Server, error) {
 		return DbPool.DefaultServer, nil
 	}
 
-	// TODO - perf issue
 	var activeServerIds []string
 	for _, serverID := range g.serverIds {
 		if server, found := g.servers[serverID]; found && server.Status == OPERATIONAL {

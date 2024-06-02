@@ -35,18 +35,6 @@ target_id: "R1"
 
 ### HRS - Hash Rule Split
 
-## TODO
-
-### Mandatory
-
-- [x] Group of servers
-    - [x] Implement ge random server from group
-- [x] Monitor MySQL servers
-- [x] Connection Pooling
-- [x] Check if current query transaction is in transaction
-- [x] Add Redis Cache
-- [ ] Add SQLite to save stats and other data
-
 ## Configuration
 
 Configuration is currently located in the `config.yml` file, and the structure looks as follows:

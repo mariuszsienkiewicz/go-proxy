@@ -1,7 +1,6 @@
 package proxy
 
 import (
-	"strings"
 	"unicode"
 )
 
@@ -14,6 +13,11 @@ const (
 	UseDatabase                    // USE DATABASE command type.
 )
 
+const (
+	SetNamesPrefix = "SET NAMES"
+	UsePrefix      = "USE"
+)
+
 // SQLCommand represents a parsed SQL command.
 type SQLCommand struct {
 	Type  CommandType // Type of the SQL command.
@@ -22,16 +26,15 @@ type SQLCommand struct {
 
 // Analyze analyzes an SQL query string and returns an SQLCommand with the detected type and value.
 func Analyze(query string) SQLCommand {
-	query = strings.TrimSpace(query)
 	if len(query) == 0 {
 		return SQLCommand{Type: Unknown}
 	}
 
-	if command, found := analyzePrefixedCommand(query, "SET NAMES", SetNames); found {
+	if command, found := analyzePrefixedCommand(query, SetNamesPrefix, SetNames); found {
 		return command
 	}
 
-	if command, found := analyzePrefixedCommand(query, "USE", UseDatabase); found {
+	if command, found := analyzePrefixedCommand(query, UsePrefix, UseDatabase); found {
 		return command
 	}
 
